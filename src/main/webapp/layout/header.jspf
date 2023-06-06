@@ -6,6 +6,7 @@
 <%@ page import="zerobase.wifi.model.PosHistoryModel" %>
 <%@ page import="zerobase.wifi.dto.PosHistoryDto" %>
 
+<body>
 
 <%
     // 위치 히스토리 목록 조회 로직
@@ -16,9 +17,9 @@
     request.setAttribute("historyList", historyList);
 %>
 
-<!DOCTYPE html>
 <html>
 <head>
+	<meta charset="EUC-KR">
     <title>와이파이에 정보 구하기</title>
     <link href="${contextPath}/res/css/main.css" rel="stylesheet" />
     <script src="${contextPath}/res/js/index.js"></script>
