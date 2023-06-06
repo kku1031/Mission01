@@ -25,14 +25,16 @@ public class WifiApiComponent {
 	public int getTotal() {
 	    int total = 0;
 	    int page = 1; // 시작 페이지 번호
-	    int itemsPerPage = 1000; // 페이지당 아이템 개수
-
-	    try {
-	        while (true) {
+		int startIndex = 1;
+		int endIndex = 1000;
+		boolean nextPage = true;
+	    
+		try {
+	        while (nextPage) {
 	            StringBuilder url = new StringBuilder("http://openapi.seoul.go.kr:8088/");
 	            url.append(URLEncoder.encode(Secret.KEY, "UTF-8"));
 	            url.append("/json/TbPublicWifiInfo/");
-	            url.append(page).append("/").append(itemsPerPage);
+	            url.append(startIndex).append("/").append(endIndex);
 
 	            // API 호출을 위한 URL 객체 생성
 	            URL apiUrl = new URL(url.toString());
@@ -48,12 +50,14 @@ public class WifiApiComponent {
 	            BufferedReader br;
 	            if (conn.getResponseCode() >= 200 && conn.getResponseCode() <= 300) {
 	                br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+              
 	            } else {
 	                br = new BufferedReader(new InputStreamReader(conn.getErrorStream()));
 	            }
 
 	            StringBuilder sb = new StringBuilder();
 	            String line;
+
 	            while ((line = br.readLine()) != null) {
 	                sb.append(line);
 	            }
@@ -63,18 +67,22 @@ public class WifiApiComponent {
 
 	            String json = sb.toString();
 	            int count = parseJson(json); // JSON 데이터 파싱하여 개수를 반환받음
-	            total += count; // 개수를 누적
-
-	            page++; // 다음 페이지로 이동
-
-	            // 추가 데이터가 없을 경우 반복 종료
-	            if (count < itemsPerPage) {
-	                break;
+	            total = startIndex + count;  // 총개수
+	            
+	            nextPage = (count == 1000 ? true : false);
+	            
+	            if(nextPage) {
+	            	startIndex = count * page + 1;
+	            	endIndex = startIndex + 999;
 	            }
+	            page++;
+	         	
 	        }
 	    } catch (Exception e) {
 	        System.out.println("API 호출에 실패했습니다. " + e.getMessage());
 	    }
+	    
+	    
 
 	    return total;
 	}
@@ -96,7 +104,7 @@ public class WifiApiComponent {
 
 			// 전체 데이터 개수
 			int totalCount = rows.size();
-
+			System.out.println(totalCount);
 			// Gson 객체 생성
 			JsonObject gsonObject = new JsonObject();
 			gsonObject.addProperty("totalCount", totalCount);

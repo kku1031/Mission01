@@ -1,18 +1,26 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" trimDirectiveWhitespaces="true" %>
-<%@ page import="zerobase.wifi.service.WifiService" %>
-<%@ page import="zerobase.wifi.model.WifiInfoModel" %>
-<%@ page import="zerobase.wifi.dto.WifiInfoDto" %>
-<%@ page import="java.util.List" %>
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-	<title>와이파이 정보 구하기</title>
-	<link href="/res/css/main.css" rel="stylesheet"/>
-	<script src="/res/js/index.js"></script>	
-</head>
-<body>	
-		<div style = "text-align: center">
-  			<a href="/index.jsp">홈 으로 가기</a>  
-		</div>
+<body>
+    <div style="text-align: center">
+        <a href="/index.jsp">홈으로 가기</a>
+    </div>
+    
+    <div>
+        데이터베이스에서 정보 가져오기
+        <%           %>
+        
+        가져온 정보 표시
+        <table>
+            <thead>
+                <tr>
+                    <th>관리번호</th>
+                    <th>자치구</th>
+                    <th>와이파이명</th>
+                    <th>도로명주소</th>
+                    추가 필드
+                </tr>
+            </thead>
+            <tbody>
+                
+            </tbody>
+        </table>
+    </div>
 </body>
-</html>
