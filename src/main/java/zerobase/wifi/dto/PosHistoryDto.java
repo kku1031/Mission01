@@ -69,5 +69,37 @@ public class PosHistoryDto {
             // PreparedStatement, Connection 닫기
             SqliteConnection.close(null, preparedStatement, connection);
         }
-    }    
+    } 
+    
+ // LocationHistory 테이블에서 특정 히스토리 삭제
+    public void deletePosHistory(int historyId) {
+        // 데이터베이스 연결 가져오기
+        Connection connection = SqliteConnection.getConnect();
+        PreparedStatement preparedStatement = null;
+
+        try {
+            String query = "DELETE FROM LocationHistory WHERE HISTORYID = ?";
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, historyId);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            // PreparedStatement, Connection 닫기
+            SqliteConnection.close(null, preparedStatement, connection);
+        }
+    }
+    
+    public static void main(String[] args) {
+        PosHistoryDto posHistoryDto = new PosHistoryDto();
+
+        double lat = 37.123456;  // 임의의 위도 값
+        double lnt = 127.987654;  // 임의의 경도 값
+        String timestamp = "2023-06-09 12:34:56";  // 임의의 타임스탬프 값
+
+        // 위치 히스토리 추가
+        posHistoryDto.insertPosHistory(lat, lnt, timestamp);
+
+        System.out.println("위치 히스토리가 추가되었습니다.");
+    }
 }

@@ -7,7 +7,6 @@
 <%@ page import="zerobase.wifi.dto.PosHistoryDto"%>
 <%@ page import="zerobase.wifi.dto.WifiInfoDto"%>
 <%@ page import="zerobase.wifi.model.WifiInfoModel"%>
-<%@ page import="java.text.DecimalFormat" %> <!-- 거리를 소수점 형식으로 표시하기 위해 추가 -->
 
 <html>
 <head>
@@ -17,6 +16,11 @@
 <script src="${contextPath}/res/js/index.js"></script>
 </head>
 <body>
+	<h1>와이파이 정보 구하기</h1>
+	<div class="api-action">
+		<a href="/">홈</a> | <a href="/history.jsp">위치 히스토리 목록</a> | 
+		<a href="/load-wifi.jsp">Open API 와이파이 정보 가져오기</a>
+	</div>
 	<table class="table-list">
 		<tr>
 				<th>ID</th>
@@ -26,50 +30,51 @@
 				<th>비고</th>
 		</tr>
 		<%
-		String latInput = request.getParameter("LAT");
-		String lntInput = request.getParameter("LNT");
+    String latInput = request.getParameter("LAT");
+    String lntInput = request.getParameter("LNT");
+
+    double LAT = 0.0;  // 초기화
+    double LNT = 0.0;  // 초기화
+
+    if (latInput != null && lntInput != null) {
+        LAT = Double.parseDouble(latInput);
+        LNT = Double.parseDouble(lntInput);
+    }
+
+    // 위치 히스토리 조회
+    PosHistoryDto posHistoryDto = new PosHistoryDto();
+    List<PosHistoryModel> historyList = posHistoryDto.SelectPosHistory();
+
+    if (!historyList.isEmpty()) {
+%>
+    
+<%
+        for (PosHistoryModel posHistoryModel : historyList) {
+            int historyId = posHistoryModel.getHISTORYID();
+            double historyLat = posHistoryModel.getLAT();
+            double historyLnt = posHistoryModel.getLNT();
+            String timestamp = posHistoryModel.getTIMESTAMP();
+%>
+    <tr>
+        <td><%= historyId %></td>
+        <td><%= historyLat %></td>
+        <td><%= historyLnt %></td>
+        <td><%= timestamp %></td>
+        <td style="text-align: center;">
+        <form action="history.jsp" method="POST">
+            <input type="hidden" name="deleteHistoryId" value="<%= historyId %>" />
+            <button type="submit">삭제</button>
+        </form>
+    </td>
+    </tr>
+<%
+        }
+%>
+</table>
+<%
+    }
+%>
 		
-		double LAT = 0.0;  // 초기화
-		double LNT = 0.0;  // 초기화
-		
-		// 위도와 경도 입력 값 받아서 있으면 표시
-		if (latInput != null && lntInput != null) {
-		    LAT = Double.valueOf(latInput);  // X좌표
-		    LNT = Double.valueOf(lntInput);  // Y좌표
-		
-		    //LocalHistory 생성
-		    PosHistoryDto posHistoryDto = new PosHistoryDto();
-		    String TIMESTAMP = String.valueOf(System.currentTimeMillis());  // 현재 시간을 문자열로 변환
-		    posHistoryDto.insertPosHistory(LAT, LNT, TIMESTAMP);
-		
-		    WifiInfoDto wifiInfoDto = new WifiInfoDto();
-		    // selectByLocation 메서드 호출
-		    List<WifiInfoModel> wifiInfoList = wifiInfoDto.selectByLocation(LAT, LNT);
-			
-		    if (!wifiInfoList.isEmpty()) {
-		        for (WifiInfoModel wifiInfoModel : wifiInfoList) {
-		            // 거리 계산
-		            double distance = WifiInfoModel.calculateDistance(LAT, LNT, wifiInfoModel.getLAT(), wifiInfoModel.getLNT());
-		            DecimalFormat df = new DecimalFormat("#.##"); // 소수점 형식으로 표시 (두 자리까지)
-		            wifiInfoModel.setDistance(Double.parseDouble(df.format(distance))); // wifiInfoModel에 거리 정보 저장
-		%>
-            <tr>
-                
-                <td><%= wifiInfoModel.getLAT() %></td>
-                <td><%= wifiInfoModel.getLNT() %></td>
-                <td><%= wifiInfoModel.getWORK_DTTM() %></td>
-            </tr>
-		<%
-		        }
-		    } else {
-		%>
-	
-		<%
-		    }
-		}
-		%>
-		
-	</table>	
 </body>	
 </html>
 <script>
@@ -89,8 +94,16 @@
 		} else {
 			alert("해당 브라우저에서 지원하지 않습니다.");
 		}
-	}
-	
-	
-	
+	}	
 </script>
+<%
+// 삭제 요청 처리
+String deleteHistoryId = request.getParameter("deleteHistoryId");
+if (deleteHistoryId != null) {
+    int historyId = Integer.parseInt(deleteHistoryId);
+
+    // 위치 히스토리 삭제
+    PosHistoryDto deleteHistoryDto = new PosHistoryDto();
+    deleteHistoryDto.deletePosHistory(historyId);
+}
+%>

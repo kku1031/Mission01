@@ -26,9 +26,7 @@
 	<form action="/" method="get">
 		<label for="LAT">LAT:</label> <input type="text" id="latInput" value="0.0" name="LAT">
 		<label for="LNT">,LNT:</label> <input type="text" id="lntInput" value="0.0" name="LNT">
-		
 		<button type="button" id="getPositionButton" onclick="showPosition()">내 위치 가져오기</button>
-	
 		<!-- 버튼 클릭, 좌표 기준으로 LocationHistory 테이블에 DB 정보 저장 -->
 		<button type="button" onclick="this.form.submit()">근처 WIFI 정보 보기</button>
 
@@ -65,11 +63,7 @@
 		if (latInput != null && lntInput != null) {
 		    LAT = Double.valueOf(latInput);  // X좌표
 		    LNT = Double.valueOf(lntInput);  // Y좌표
-		
-		    //LocalHistory 생성
-		    PosHistoryDto posHistoryDto = new PosHistoryDto();
-		    String TIMESTAMP = String.valueOf(System.currentTimeMillis());  // 현재 시간을 문자열로 변환
-		    posHistoryDto.insertPosHistory(LAT, LNT, TIMESTAMP);
+		   
 		
 		    WifiInfoDto wifiInfoDto = new WifiInfoDto();
 		    // selectByLocation 메서드 호출
@@ -127,9 +121,6 @@
 				var LNT = position.coords.longitude;
 				document.getElementById("latInput").value = LAT;
 				document.getElementById("lntInput").value = LNT;
-				
-			
-	
 			}, function(error) {
 				console.error("위치 정보를 가져오는데 실패했습니다.", error);
 				alert("위치 정보를 가져오는데 실패했습니다. 브라우저 설정을 확인해주세요.");
@@ -138,7 +129,4 @@
 			alert("해당 브라우저에서 지원하지 않습니다.");
 		}
 	}
-	
-	
-	
 </script>
