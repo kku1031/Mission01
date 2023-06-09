@@ -1,26 +1,16 @@
 package zerobase.wifi.dto;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import zerobase.wifi.model.WifiInfoModel;
 import zerobase.wifi.service.SqliteConnection;
 
 public class WifiInfoDto {
-
-	private Date parseDate(String dateString) throws ParseException {
-	    SimpleDateFormat dateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
-	    java.util.Date parsedDate = dateFormat.parse(dateString);
-	    return new Date(parsedDate.getTime());
-	}
 	
 	//DB삽입
 	public void insert(WifiInfoModel wifiInfoModel) {
@@ -115,7 +105,7 @@ public class WifiInfoDto {
 	            wifiInfoModel.setX_SWIFI_REMARS3(resultSet.getString("X_SWIFI_REMARS3"));
 	            wifiInfoModel.setLAT(resultSet.getDouble("LAT"));
 	            wifiInfoModel.setLNT(resultSet.getDouble("LNT"));
-	            wifiInfoModel.setWORK_DTTM(resultSet.getTimestamp("WORK_DTTM"));
+	            wifiInfoModel.setWORK_DTTM(resultSet.getString("WORK_DTTM"));
 
 	            dataList.add(wifiInfoModel);
 	        }
@@ -128,8 +118,6 @@ public class WifiInfoDto {
 
 	    return dataList;
 	}
-	
-	
 	
 	// DB주어진 위도와 경도에 가장 가까운 와이파이 정보 20개를 조회
 	public List<WifiInfoModel> selectByLocation(double LAT, double LNT) {
@@ -177,16 +165,12 @@ public class WifiInfoDto {
 				wifiInfoModel.setX_SWIFI_REMARS3(resultSet.getString("X_SWIFI_REMARS3"));
 				wifiInfoModel.setLAT(resultSet.getDouble("LAT"));
 				wifiInfoModel.setLNT(resultSet.getDouble("LNT"));
-
-				// WORK_DTTM을 String에서 Date로 변환하여 설정
-				String dateString = resultSet.getString("WORK_DTTM");
-				Date workDttm = parseDate(dateString);
-				wifiInfoModel.setWORK_DTTM(workDttm);
+				wifiInfoModel.setWORK_DTTM(resultSet.getString("WORK_DTTM"));
 
 				// 리스트에 추가
 				nearWifiInfo.add(wifiInfoModel);
 			}
-		} catch (SQLException | ParseException e) {
+		} catch (SQLException e) {
 			System.out.println("데이터베이스 연결 또는 쿼리 실행 중 오류가 발생했습니다. " + e.getMessage());
 		} finally {
 			// ResultSet, PreparedStatement 및 Connection 닫기
@@ -195,20 +179,4 @@ public class WifiInfoDto {
 
 		return nearWifiInfo;
 	}
-	
-	public static void main(String[] args) {
-	    // 테스트를 위한 예시 코드입니다.
-	    double latitude = 37.12345; // 위도
-	    double longitude = 127.98765; // 경도
-	    
-	    WifiInfoDto wifiInfoDto = new WifiInfoDto();
-	    List<WifiInfoModel> wifiInfoList = wifiInfoDto.selectByLocation(latitude, longitude);
-	    
-	    for (WifiInfoModel wifiInfoModel : wifiInfoList) {
-	      System.out.println(wifiInfoModel.getX_SWIFI_ADRES1());
-	    }
-	  }
-	
-	
-	
 }

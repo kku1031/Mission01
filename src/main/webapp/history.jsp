@@ -1,87 +1,96 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" trimDirectiveWhitespaces="true"%>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"
+	trimDirectiveWhitespaces="true"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%@ page import="zerobase.wifi.dto.PosHistoryDto"%>
-<%@ page import="zerobase.wifi.model.PosHistoryModel"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
 <%@ page import="java.util.List"%>
- 
-<!DOCTYPE html>
+<%@ page import="zerobase.wifi.model.PosHistoryModel"%>
+<%@ page import="zerobase.wifi.dto.PosHistoryDto"%>
+<%@ page import="zerobase.wifi.dto.WifiInfoDto"%>
+<%@ page import="zerobase.wifi.model.WifiInfoModel"%>
+<%@ page import="java.text.DecimalFormat" %> <!-- 거리를 소수점 형식으로 표시하기 위해 추가 -->
+
 <html>
 <head>
-<title>위치 정보 저장 예시</title>
-<!-- 필요한 CSS 및 JavaScript 파일들을 로드 -->
-<link href="${pageContext.request.contextPath}/res/css/main.css" rel="stylesheet" />
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="${pageContext.request.contextPath}/res/js/index.js"></script>
+<meta charset="UTF-8">
+<title>와이파이 정보 구하기</title>
+<link href="${contextPath}/res/css/main.css" rel="stylesheet" />
+<script src="${contextPath}/res/js/index.js"></script>
 </head>
 <body>
-	<h1>위치 정보 저장 예시</h1>
-	<%-- 위치 정보 목록을 가져오기 위해 PosHistoryDto 클래스 인스턴스화 --%>
-	<%
-		PosHistoryDto posHistoryDto = new PosHistoryDto();
-	%>
-	<%-- 위치 정보를 조회하여 locationList에 할당 --%>
-	<%
-		List<PosHistoryModel> locationList = posHistoryDto.SelectPosHistory();
-	%>
-	<table id="locationTable" class="table-list">
-		<thead>
-			<tr>
+	<table class="table-list">
+		<tr>
 				<th>ID</th>
 				<th>X 좌표</th>
 				<th>Y 좌표</th>
 				<th>조회 일자</th>
 				<th>비고</th>
-			</tr>
-		</thead>
-		<tbody>
-			<%-- 위치 정보를 동적으로 추가할 행들 --%>
-			<c:forEach var="posHistory" items="${locationList}">
-				<tr>
-					<td>${posHistory.historyID}</td>
-					<td>${posHistory.latitude}</td>
-					<td>${posHistory.longitude}</td>
-					<td>${posHistory.timestamp}</td>
-					<td>${posHistory.note}</td>
-				</tr>
-			</c:forEach>
-		</tbody>
-	</table>
-	<script>
-		function showLocationOnTable(id, latitude, longitude, timestamp, note) {
-			// 위치 정보를 HTML 테이블에 표시
-			var table = document.getElementById("locationTable");
-			var tbody = table.querySelector("tbody");
-
-			// 새로운 행 추가
-			var row = document.createElement("tr");
-
-			// ID 열
-			var idCell = document.createElement("td");
-			idCell.textContent = id;
-			row.appendChild(idCell);
-
-			// X 좌표 열
-			var latitudeCell = document.createElement("td");
-			latitudeCell.textContent = latitude;
-			row.appendChild(latitudeCell);
-
-			// Y 좌표 열
-			var longitudeCell = document.createElement("td");
-			longitudeCell.textContent = longitude;
-			row.appendChild(longitudeCell);
-
-			// 조회 일자 열
-			var timestampCell = document.createElement("td");
-			timestampCell.textContent = timestamp;
-			row.appendChild(timestampCell);
-
-			// 비고 열
-			var noteCell = document.createElement("td");
-			noteCell.textContent = note;
-			row.appendChild(noteCell);
-
-			tbody.appendChild(row);
+		</tr>
+		<%
+		String latInput = request.getParameter("LAT");
+		String lntInput = request.getParameter("LNT");
+		
+		double LAT = 0.0;  // 초기화
+		double LNT = 0.0;  // 초기화
+		
+		// 위도와 경도 입력 값 받아서 있으면 표시
+		if (latInput != null && lntInput != null) {
+		    LAT = Double.valueOf(latInput);  // X좌표
+		    LNT = Double.valueOf(lntInput);  // Y좌표
+		
+		    //LocalHistory 생성
+		    PosHistoryDto posHistoryDto = new PosHistoryDto();
+		    String TIMESTAMP = String.valueOf(System.currentTimeMillis());  // 현재 시간을 문자열로 변환
+		    posHistoryDto.insertPosHistory(LAT, LNT, TIMESTAMP);
+		
+		    WifiInfoDto wifiInfoDto = new WifiInfoDto();
+		    // selectByLocation 메서드 호출
+		    List<WifiInfoModel> wifiInfoList = wifiInfoDto.selectByLocation(LAT, LNT);
+			
+		    if (!wifiInfoList.isEmpty()) {
+		        for (WifiInfoModel wifiInfoModel : wifiInfoList) {
+		            // 거리 계산
+		            double distance = WifiInfoModel.calculateDistance(LAT, LNT, wifiInfoModel.getLAT(), wifiInfoModel.getLNT());
+		            DecimalFormat df = new DecimalFormat("#.##"); // 소수점 형식으로 표시 (두 자리까지)
+		            wifiInfoModel.setDistance(Double.parseDouble(df.format(distance))); // wifiInfoModel에 거리 정보 저장
+		%>
+            <tr>
+                
+                <td><%= wifiInfoModel.getLAT() %></td>
+                <td><%= wifiInfoModel.getLNT() %></td>
+                <td><%= wifiInfoModel.getWORK_DTTM() %></td>
+            </tr>
+		<%
+		        }
+		    } else {
+		%>
+	
+		<%
+		    }
 		}
-	</script>
-</body>
+		%>
+		
+	</table>	
+</body>	
 </html>
+<script>
+	//geolocation 위치 정보 가져오기	
+	function showPosition() {
+		if (navigator.geolocation) {
+			navigator.geolocation.getCurrentPosition(function(position) {
+				var LAT = position.coords.latitude;
+				var LNT = position.coords.longitude;
+				document.getElementById("latInput").value = LAT;
+				document.getElementById("lntInput").value = LNT;
+	
+			}, function(error) {
+				console.error("위치 정보를 가져오는데 실패했습니다.", error);
+				alert("위치 정보를 가져오는데 실패했습니다. 브라우저 설정을 확인해주세요.");
+			});
+		} else {
+			alert("해당 브라우저에서 지원하지 않습니다.");
+		}
+	}
+	
+	
+	
+</script>

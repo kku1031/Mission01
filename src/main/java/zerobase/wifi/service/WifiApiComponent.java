@@ -5,9 +5,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 import org.json.simple.JSONArray;
@@ -159,14 +156,7 @@ public class WifiApiComponent {
 						}
 					}
 
-					// WORK_DTTM 필드를 Date 객체로 변환하여 설정
-					SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-					try {
-						Date workDttm = dateFormat.parse((String) row.get("WORK_DTTM"));
-						wifiInfoModel.setWORK_DTTM(workDttm);
-					} catch (ParseException e) {
-						System.out.println("날짜 변환 오류: " + e.getMessage());
-					}
+					wifiInfoModel.setX_SWIFI_CMCWR((String) row.get("WORK_DTTM")); // 망종류
 
 					// WifiInfoDto 객체 생성 - WifiinfoDto 호출에서 데이터 저장.
 					WifiInfoDto wifiInfoDto = new WifiInfoDto();
@@ -179,12 +169,5 @@ public class WifiApiComponent {
 			System.out.println("JSON 파싱에 실패했습니다. " + e.getMessage());
 			return 0;
 		}
-	}
-
-	public static void main(String[] args) {
-		WifiApiComponent wifiApiComponent = new WifiApiComponent();
-		// getTotal() 메소드 호출하여 전체 데이터 개수 가져오기
-		int total = wifiApiComponent.getTotal();
-		System.out.println("전체 데이터 개수: " + total);
 	}
 }

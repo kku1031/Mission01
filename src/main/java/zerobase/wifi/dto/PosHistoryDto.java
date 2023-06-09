@@ -27,10 +27,10 @@ public class PosHistoryDto {
 
             while (resultSet.next()) {
                 PosHistoryModel history = new PosHistoryModel();
-                history.setHistoryID(resultSet.getInt("HistoryID"));
-                history.setLatitude(resultSet.getDouble("Latitude"));
-                history.setLongitude(resultSet.getDouble("Longitude"));
-                history.setTimestamp(resultSet.getString("Timestamp"));
+                history.setHISTORYID(resultSet.getInt("HISTORYID"));
+                history.setLAT(resultSet.getDouble("LAT"));
+                history.setLNT(resultSet.getDouble("LNT"));
+                history.setTIMESTAMP(resultSet.getString("TIMESTAMP"));
 
                 historyList.add(history);
             }
@@ -44,33 +44,30 @@ public class PosHistoryDto {
         return historyList;
     }
 
-	//LocationHistory DB연결 및 추가
-	public void InsertPosHistory(double latitude, double longitude, String timestamp) {
-	    // 데이터베이스 연결 가져오기
-	    Connection connection = SqliteConnection.getConnect();
-	    PreparedStatement preparedStatement = null;
+    // LocationHistory 테이블에 추가
+    public void insertPosHistory(double LAT, double LNT, String TIMESTAMP) {
+        // 데이터베이스 연결 가져오기
+        Connection connection = SqliteConnection.getConnect();
+        PreparedStatement preparedStatement = null;
 
-	    try {
-	        String query = "INSERT INTO LocationHistory (HistoryID, Latitude, Longitude, Timestamp) VALUES (?, ?, ?, ?)";
-	        preparedStatement = connection.prepareStatement(query);
-	        
-	        PosHistoryModel history = new PosHistoryModel();
-	        history.setLatitude(latitude);
-	        history.setLongitude(longitude);
-	        history.setTimestamp(timestamp);
+        try {
+            String query = "INSERT INTO LocationHistory (LAT, LNT, TIMESTAMP) VALUES (?, ?, ?)";
+            preparedStatement = connection.prepareStatement(query);
 
-	        preparedStatement.setInt(1, history.getHistoryID()); // 히스토리 식별자 지정
-	        preparedStatement.setDouble(2, history.getLatitude());
-	        preparedStatement.setDouble(3, history.getLongitude());
-	        preparedStatement.setString(4, history.getTimestamp());
-	        preparedStatement.executeUpdate();
-	    } catch (SQLException e) {
-	        e.printStackTrace();
-	    } finally {
-	        // PreparedStatement, Connection 닫기
-	        SqliteConnection.close(null, preparedStatement, connection);
-	    }
-	}
+            PosHistoryModel posHistoryModel = new PosHistoryModel();
+            posHistoryModel.setLAT(LAT);
+            posHistoryModel.setLNT(LNT);
+            posHistoryModel.setTIMESTAMP(TIMESTAMP);
+
+            preparedStatement.setDouble(1, posHistoryModel.getLAT());
+            preparedStatement.setDouble(2, posHistoryModel.getLNT());
+            preparedStatement.setString(3, posHistoryModel.getTIMESTAMP());
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            // PreparedStatement, Connection 닫기
+            SqliteConnection.close(null, preparedStatement, connection);
+        }
+    }    
 }
-
-
