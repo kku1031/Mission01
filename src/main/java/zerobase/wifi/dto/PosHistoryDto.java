@@ -90,16 +90,4 @@ public class PosHistoryDto {
         }
     }
     
-    public static void main(String[] args) {
-        PosHistoryDto posHistoryDto = new PosHistoryDto();
-
-        double lat = 37.123456;  // 임의의 위도 값
-        double lnt = 127.987654;  // 임의의 경도 값
-        String timestamp = "2023-06-09 12:34:56";  // 임의의 타임스탬프 값
-
-        // 위치 히스토리 추가
-        posHistoryDto.insertPosHistory(lat, lnt, timestamp);
-
-        System.out.println("위치 히스토리가 추가되었습니다.");
-    }
 }

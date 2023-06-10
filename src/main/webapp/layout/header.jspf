@@ -8,6 +8,8 @@
 <%@ page import="zerobase.wifi.dto.WifiInfoDto"%>
 <%@ page import="zerobase.wifi.model.WifiInfoModel"%>
 <%@ page import="java.text.DecimalFormat" %> <!-- 거리를 소수점 형식으로 표시하기 위해 추가 -->
+<%@ page import="java.text.SimpleDateFormat"%>
+<%@ page import="java.util.Date"%>
 
 <html>
 <head>
@@ -27,7 +29,7 @@
 		<label for="LAT">LAT:</label> <input type="text" id="latInput" value="0.0" name="LAT">
 		<label for="LNT">,LNT:</label> <input type="text" id="lntInput" value="0.0" name="LNT">
 		<button type="button" id="getPositionButton" onclick="showPosition()">내 위치 가져오기</button>
-		<!-- 버튼 클릭, 좌표 기준으로 LocationHistory 테이블에 DB 정보 저장 -->
+		
 		<button type="button" onclick="this.form.submit()">근처 WIFI 정보 보기</button>
 
 	</form>
@@ -63,8 +65,15 @@
 		if (latInput != null && lntInput != null) {
 		    LAT = Double.valueOf(latInput);  // X좌표
 		    LNT = Double.valueOf(lntInput);  // Y좌표
-		   
-		
+		 	
+		 // 현재 시간을 문자열로 변환
+		    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		    String timestamp = dateFormat.format(new Date());
+		    
+		    // 위치 정보 저장
+	        PosHistoryDto posHistoryDto = new PosHistoryDto();
+	        posHistoryDto.insertPosHistory(LAT, LNT, timestamp);
+	    }
 		    WifiInfoDto wifiInfoDto = new WifiInfoDto();
 		    // selectByLocation 메서드 호출
 		    List<WifiInfoModel> wifiInfoList = wifiInfoDto.selectByLocation(LAT, LNT);
@@ -95,21 +104,19 @@
                 <td><%= wifiInfoModel.getLNT() %></td>
                 <td><%= wifiInfoModel.getWORK_DTTM() %></td>
             </tr>
-		<%
+			<%
 		        }
 		    } else {
 		%>
-	
+	    <tr>
+	        <td colspan="17" class="td-center">
+	            <p class="nothing">조회된 결과가 없습니다.</p>
+	        </td>
+	    </tr>
 		<%
 		    }
-		}
 		%>
-		<tr>
-            <td colspan="17" class="td-center">
-                <p class="nothing">조회된 결과가 없습니다.</p>
-            </td>
-        </tr>
-	</table>	
+		</table>		
 </body>	
 </html>
 <script>
