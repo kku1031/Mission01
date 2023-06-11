@@ -103,12 +103,12 @@ public class WifiApiComponent {
 
 			// 전체 데이터 개수
 			int totalCount = rows.size();
-
+			System.out.println(totalCount);
 			// Gson 객체 생성
 			JsonObject gsonObject = new JsonObject();
 			gsonObject.addProperty("totalCount", totalCount);
 
-			// getTotal() 메소드 내의 데이터베이스 저장 부분 수정
+			// getTotal() 메소드 내의 데이터베이스 
 			List<WifiInfoModel> existingData = WifiInfoDto.SelectAll();
 
 			if (existingData.isEmpty()) {

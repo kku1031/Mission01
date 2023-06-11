@@ -7,7 +7,8 @@
 <%@ page import="zerobase.wifi.dto.PosHistoryDto"%>
 <%@ page import="zerobase.wifi.dto.WifiInfoDto"%>
 <%@ page import="zerobase.wifi.model.WifiInfoModel"%>
-<%@ page import="java.text.DecimalFormat" %> <!-- 거리를 소수점 형식으로 표시하기 위해 추가 -->
+<!-- 거리를 소수점 형식으로 표시하기 위해 추가 -->
+<%@ page import="java.text.DecimalFormat"%>
 <%@ page import="java.text.SimpleDateFormat"%>
 <%@ page import="java.util.Date"%>
 
@@ -21,19 +22,21 @@
 <body>
 	<h1>와이파이 정보 구하기</h1>
 	<div class="api-action">
-		<a href="/">홈</a> | <a href="/history.jsp">위치 히스토리 목록</a> | 
-		<a href="/load-wifi.jsp">Open API 와이파이 정보 가져오기</a>
+		<a href="/">홈</a> | <a href="/history.jsp">위치 히스토리 목록</a> | <a
+			href="/load-wifi.jsp">Open API 와이파이 정보 가져오기</a>
 	</div>
 
 	<form action="/" method="get">
-		<label for="LAT">위도:</label> <input type="text" id="latInput" value="0.0" name="LAT">
-		<label for="LNT">경도:</label> <input type="text" id="lntInput" value="0.0" name="LNT">
-		<button type="button" id="getPositionButton" onclick="showPosition()">내 위치 가져오기</button>
-		
-		<button type="button" onclick="this.form.submit()">근처 WIFI 정보 보기</button>
+		<label for="LAT">위도:</label> <input type="text" id="latInput"
+			value="0.0" name="LAT"> <label for="LNT">경도:</label> <input
+			type="text" id="lntInput" value="0.0" name="LNT">
+		<button type="button" id="getPositionButton" onclick="showPosition()">내
+			위치 가져오기</button>
+
+		<button type="button" onclick="this.form.submit()">근처 WIFI 정보
+			보기</button>
 
 	</form>
-
 	<table class="table-list">
 		<tr>
 			<th>거리</th>
@@ -52,75 +55,87 @@
 			<th>WIFI 접속환경</th>
 			<th>X좌표</th>
 			<th>Y좌표</th>
-			<th>작업일자</th>				
+			<th>작업일자</th>
 		</tr>
 		<%
 		String latInput = request.getParameter("LAT");
 		String lntInput = request.getParameter("LNT");
-		
-		double LAT = 0.0;  // 초기화
-		double LNT = 0.0;  // 초기화
-		
+
+		double LAT = 0.0; // 초기화
+		double LNT = 0.0; // 초기화
+
 		// 위도와 경도 입력 값 받아서 있으면 표시
 		if (latInput != null && lntInput != null) {
-		    LAT = Double.valueOf(latInput);  // X좌표
-		    LNT = Double.valueOf(lntInput);  // Y좌표
-		 	
-		 // 현재 시간을 문자열로 변환
-		    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		    String timestamp = dateFormat.format(new Date());
-		    
-		    // 위치 정보 저장
-	        PosHistoryDto posHistoryDto = new PosHistoryDto();
-	        posHistoryDto.insertPosHistory(LAT, LNT, timestamp);
-	    }
-		    WifiInfoDto wifiInfoDto = new WifiInfoDto();
-		    // selectByLocation 메서드 호출
-		    List<WifiInfoModel> wifiInfoList = wifiInfoDto.selectByLocation(LAT, LNT);
-			
-		    if (!wifiInfoList.isEmpty()) {
-		        for (WifiInfoModel wifiInfoModel : wifiInfoList) {
-		            // 거리 계산
-		            double distance = WifiInfoModel.calculateDistance(LAT, LNT, wifiInfoModel.getLAT(), wifiInfoModel.getLNT());
-		            DecimalFormat df = new DecimalFormat("#.##"); // 소수점 형식으로 표시 (두 자리까지)
-		            wifiInfoModel.setDistance(Double.parseDouble(df.format(distance))); // wifiInfoModel에 거리 정보 저장
+			LAT = Double.valueOf(latInput); // X좌표
+			LNT = Double.valueOf(lntInput); // Y좌표
+
+			// 현재 시간을 문자열로 변환
+			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			String timestamp = dateFormat.format(new Date());
+
+			// 위치 정보 저장
+			PosHistoryDto posHistoryDto = new PosHistoryDto();
+			posHistoryDto.insertPosHistory(LAT, LNT, timestamp);
+
+			WifiInfoDto wifiInfoDto = new WifiInfoDto();
+			// selectByLocation 메서드 호출
+			List<WifiInfoModel> wifiInfoList = wifiInfoDto.selectByLocation(LAT, LNT);
+
+			if (!wifiInfoList.isEmpty()) {
+				for (WifiInfoModel wifiInfoModel : wifiInfoList) {
+			// 거리 계산
+			double distance = WifiInfoModel.calculateDistance(LAT, LNT, wifiInfoModel.getLAT(), wifiInfoModel.getLNT());
+			DecimalFormat df = new DecimalFormat("#.##"); // 소수점 형식으로 표시 (두 자리까지)
+			wifiInfoModel.setDistance(Double.parseDouble(df.format(distance))); // wifiInfoModel에 거리 정보 저장
 		%>
-            <tr>
-                <td><%= wifiInfoModel.getDistance() %> km</td>
-                <td><%= wifiInfoModel.getX_SWIFI_WRDOFC() %></td>
-                <td><%= wifiInfoModel.getX_SWIFI_MGR_NO() %></td>
-                <td><%= wifiInfoModel.getX_SWIFI_MAIN_NM() %></td>
-                <td><%= wifiInfoModel.getX_SWIFI_ADRES1() %></td>
-                <td><%= wifiInfoModel.getX_SWIFI_ADRES2() %></td>
-                <td><%= wifiInfoModel.getX_SWIFI_INSTL_FLOOR() %></td>
-                <td><%= wifiInfoModel.getX_SWIFI_INSTL_TY() %></td>
-                <td><%= wifiInfoModel.getX_SWIFI_INSTL_MBY() %></td>
-                <td><%= wifiInfoModel.getX_SWIFI_SVC_SE() %></td>
-                <td><%= wifiInfoModel.getX_SWIFI_CMCWR() %></td>
-                <td><%= wifiInfoModel.getX_SWIFI_CNSTC_YEAR() %></td>
-                <td><%= wifiInfoModel.getX_SWIFI_INOUT_DOOR() %></td>
-                <td><%= wifiInfoModel.getX_SWIFI_REMARS3() %></td>
-                <td><%= wifiInfoModel.getLAT() %></td>
-                <td><%= wifiInfoModel.getLNT() %></td>
-                <td><%= wifiInfoModel.getWORK_DTTM() %></td>
-            </tr>
-			<%
-		        }
-		    } else {
-		%>
-	    <tr>
-	        <td colspan="17" class="td-center">
-	            <p class="nothing">조회된 결과가 없습니다.</p>
-	        </td>
-	    </tr>
+		<tr>
+			<td><%=wifiInfoModel.getDistance()%> km</td>
+			<td><%=wifiInfoModel.getX_SWIFI_MGR_NO()%></td>
+			<td><%=wifiInfoModel.getX_SWIFI_WRDOFC()%></td>
+			<td><%=wifiInfoModel.getX_SWIFI_MAIN_NM()%></td>
+			<td><%=wifiInfoModel.getX_SWIFI_ADRES1()%></td>
+			<td><%=wifiInfoModel.getX_SWIFI_ADRES2()%></td>
+			<td><%=wifiInfoModel.getX_SWIFI_INSTL_FLOOR()%></td>
+			<td><%=wifiInfoModel.getX_SWIFI_INSTL_TY()%></td>
+			<td><%=wifiInfoModel.getX_SWIFI_INSTL_MBY()%></td>
+			<td><%=wifiInfoModel.getX_SWIFI_SVC_SE()%></td>
+			<td><%=wifiInfoModel.getX_SWIFI_CMCWR()%></td>
+			<td><%=wifiInfoModel.getX_SWIFI_CNSTC_YEAR()%></td>
+			<td><%=wifiInfoModel.getX_SWIFI_INOUT_DOOR()%></td>
+			<td><%=wifiInfoModel.getX_SWIFI_REMARS3()%></td>
+			<td><%=wifiInfoModel.getLAT()%></td>
+			<td><%=wifiInfoModel.getLNT()%></td>
+			<td><%=wifiInfoModel.getWORK_DTTM()%></td>
+		</tr>
 		<%
-		    }
+		}
+				
+		} else {
 		%>
-		</table>
-</body>	
+		<tr>
+			<td colspan="17" class="td-center">
+				<p class="nothing">해당 위치 주변에 와이파이 정보가 없습니다.</p>
+			</td>
+		</tr>
+		<%
+		}
+			
+		} else {
+		%>
+		<tr>
+			<td colspan="17" class="td-center">
+				<p class="nothing">위치 정보를 입력한 후에 조회해주세요.</p>
+			</td>
+		</tr>
+		
+		<%
+		}
+		%>
+	</table>
+</body>
 </html>
 <script>
-	//geolocation 위치 정보 가져오기	
+	// geolocation 위치 정보 가져오기	
 	function showPosition() {
 		if (navigator.geolocation) {
 			navigator.geolocation.getCurrentPosition(function(position) {
@@ -135,5 +150,13 @@
 		} else {
 			alert("해당 브라우저에서 지원하지 않습니다.");
 		}
+	}
+	
+	// 저장된 위도와 경도 값이 있는 경우 인풋 태그에 표시
+	var savedLAT = "<%=LAT%>";
+	var savedLNT = "<%=LNT%>";
+	if (savedLAT && savedLNT) {
+		document.getElementById("latInput").value = savedLAT;
+		document.getElementById("lntInput").value = savedLNT;
 	}
 </script>

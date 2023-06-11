@@ -65,7 +65,6 @@ public class WifiInfoDto {
 	
 	//DB삽입
 	public void insert(WifiInfoModel wifiInfoModel) {
-		// 여기에 데이터베이스에 insert하는 코드를 작성하세요.
 		Connection connection = null;
 		PreparedStatement preparedStatement = null;
 		// ResultSet은 select 부분에서 주로 사용하여 기입하지 않았다.
