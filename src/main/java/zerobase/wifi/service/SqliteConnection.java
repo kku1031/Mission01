@@ -12,18 +12,18 @@ public class SqliteConnection {
         }
     }
 
-    // 데이터베이스 연결을 가져옵니다.
+    // 데이터베이스 연결을 가져오기
     public static Connection getConnect() {
 
         final String dbPath = "C:\\dev\\sqlite-tools-win32-x86-3420000";
         final String fileLocation = dbPath + "/sqlite3db.db";
 
-        // SQLite 연결 문자열을 생성합니다.
+        // SQLite 연결 문자열을 생성
         String url = "jdbc:sqlite:" + fileLocation;
         Connection connection = null;
 
         try {
-            // 지정된 URL로 데이터베이스에 연결합니다.
+            // 지정된 URL로 데이터베이스에 연결
             connection = DriverManager.getConnection(url);
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -36,7 +36,7 @@ public class SqliteConnection {
     public static void close(ResultSet rs, PreparedStatement preparedStatement, Connection connection) {
 
         try {
-            // ResultSet이 열려있고 닫혀있지 않은 경우 닫습니다.
+            // ResultSet이 열려있고 닫혀있지 않은 경우 닫기.
             if (rs != null && !rs.isClosed()) {
                 rs.close();
             }
@@ -45,7 +45,7 @@ public class SqliteConnection {
         }
 
         try {
-            // PreparedStatement가 열려있고 닫혀있지 않은 경우 닫습니다.
+            // PreparedStatement가 열려있고 닫혀있지 않은 경우 닫기.
             if (preparedStatement != null && !preparedStatement.isClosed()) {
                 preparedStatement.close();
             }
@@ -54,7 +54,7 @@ public class SqliteConnection {
         }
 
         try {
-            // Connection이 열려있고 닫혀있지 않은 경우 닫습니다.
+            // Connection이 열려있고 닫혀있지 않은 경우 닫기.
             if (connection != null && !connection.isClosed()) {
                 connection.close();
             }

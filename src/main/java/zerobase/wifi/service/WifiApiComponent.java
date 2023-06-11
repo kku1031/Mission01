@@ -86,7 +86,9 @@ public class WifiApiComponent {
 
 	// 전달된 JSON 문자열을 Gson을 사용하여 처리하고, 파싱된 데이터를 gsonObject에 저장
 	// 파싱된 데이터를 처리하여 개수를 반환하는 메소드
-	private int parseJson(String json) {
+	
+	
+	public int parseJson(String json) {
 		try {
 			JSONParser parser = new JSONParser();
 
@@ -101,7 +103,6 @@ public class WifiApiComponent {
 
 			// 전체 데이터 개수
 			int totalCount = rows.size();
-			System.out.println(totalCount);
 
 			// Gson 객체 생성
 			JsonObject gsonObject = new JsonObject();
@@ -129,12 +130,13 @@ public class WifiApiComponent {
 					wifiInfoModel.setX_SWIFI_SVC_SE((String) row.get("X_SWIFI_SVC_SE")); // 서비스구분
 					wifiInfoModel.setX_SWIFI_CMCWR((String) row.get("X_SWIFI_CMCWR")); // 망종류
 
-					// 설치년도 처리
+					// 설치년도 처리(String으로 파싱된 부분을 int로 변환시켜서 처리) 
 					String installYearStr = (String) row.get("X_SWIFI_CNSTC_YEAR");
 					if (installYearStr != null && !installYearStr.isEmpty()) {
 						try {
 							int installYear = Integer.parseInt(installYearStr);
 							wifiInfoModel.setX_SWIFI_CNSTC_YEAR(installYear);
+					//NumberFormatException은 숫자로 변환할 수 없는 문자열을 숫자로 변환하려고 할 때 발생하는 예외
 						} catch (NumberFormatException e) {
 							System.out.println("설치년도 파싱에 실패했습니다. 설치년도: " + installYearStr);
 						}
@@ -156,7 +158,7 @@ public class WifiApiComponent {
 						}
 					}
 
-					wifiInfoModel.setX_SWIFI_CMCWR((String) row.get("WORK_DTTM")); // 망종류
+					wifiInfoModel.setWORK_DTTM(row.get("WORK_DTTM").toString()); // 작업일시
 
 					// WifiInfoDto 객체 생성 - WifiinfoDto 호출에서 데이터 저장.
 					WifiInfoDto wifiInfoDto = new WifiInfoDto();

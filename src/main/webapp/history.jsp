@@ -40,12 +40,12 @@
 			LAT = Double.parseDouble(latInput);
 			LNT = Double.parseDouble(lntInput);
 		}
-		
+
 		// 현재 시간을 TIMESTAMP로 설정
-        java.util.Date date = new java.util.Date();
-        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String TIMESTAMP = sdf.format(date);
-        
+		java.util.Date date = new java.util.Date();
+		java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String TIMESTAMP = sdf.format(date);
+
 		// 위치 히스토리 조회
 		PosHistoryDto posHistoryDto = new PosHistoryDto();
 		List<PosHistoryModel> historyList = posHistoryDto.SelectPosHistory();
@@ -67,8 +67,7 @@
 			<td><%=timestamp%></td>
 			<td style="text-align: center;">
 				<form action="history.jsp" method="POST">
-					<input type="hidden" name="deleteHistoryId"
-						value="<%=historyId%>" />
+					<input type="hidden" name="deleteHistoryId" value="<%=historyId%>" />
 					<button type="submit">삭제</button>
 				</form>
 			</td>
@@ -83,14 +82,14 @@
 </body>
 </html>
 <%
-	// 삭제 요청 처리
-	String deleteHistoryId = request.getParameter("deleteHistoryId");
-	if (deleteHistoryId != null) {
-		int historyId = Integer.parseInt(deleteHistoryId);
-	
-		// 위치 히스토리 삭제
-		PosHistoryDto deleteHistoryDto = new PosHistoryDto();
-		deleteHistoryDto.deletePosHistory(historyId);
-	}
-	%>
+// 삭제 요청 처리
+String deleteHistoryId = request.getParameter("deleteHistoryId");
+if (deleteHistoryId != null) {
+	int historyId = Integer.parseInt(deleteHistoryId);
+
+	// 위치 히스토리 삭제
+	PosHistoryDto deleteHistoryDto = new PosHistoryDto();
+	deleteHistoryDto.deletePosHistory(historyId);
+}
+%>
 

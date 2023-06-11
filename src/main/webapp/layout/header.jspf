@@ -26,8 +26,8 @@
 	</div>
 
 	<form action="/" method="get">
-		<label for="LAT">LAT:</label> <input type="text" id="latInput" value="0.0" name="LAT">
-		<label for="LNT">,LNT:</label> <input type="text" id="lntInput" value="0.0" name="LNT">
+		<label for="LAT">위도:</label> <input type="text" id="latInput" value="0.0" name="LAT">
+		<label for="LNT">경도:</label> <input type="text" id="lntInput" value="0.0" name="LNT">
 		<button type="button" id="getPositionButton" onclick="showPosition()">내 위치 가져오기</button>
 		
 		<button type="button" onclick="this.form.submit()">근처 WIFI 정보 보기</button>
@@ -116,7 +116,7 @@
 		<%
 		    }
 		%>
-		</table>		
+		</table>
 </body>	
 </html>
 <script>
